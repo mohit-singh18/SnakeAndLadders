@@ -4,6 +4,7 @@ import 'board.dart';
 import 'cell.dart';
 import 'dice.dart';
 import 'pieces.dart';
+import 'path.dart';
 
 class Gameboard extends StatefulWidget {
   const Gameboard({super.key});
@@ -19,6 +20,7 @@ class _GameboardState extends State<Gameboard> {
   late Piece piece1 = Piece(Player.player1, 30);
   late Piece piece2 = Piece(Player.player2, 30);
   int diceno = Dice().rolldice();
+  Path path = Path();
 
   @override
   void initState() {
@@ -94,7 +96,8 @@ class _GameboardState extends State<Gameboard> {
       padding: const EdgeInsets.all(5.0),
       child: Container(
         // ignore: sort_child_properties_last
-        child: _buildpiece(board[index].numpieces, board[index].piece),
+        child: _buildpiece(
+            board[index].numpieces, board[index].piece, Path().pth, index),
         decoration: BoxDecoration(
           color: board[index].color,
         ),
@@ -102,42 +105,72 @@ class _GameboardState extends State<Gameboard> {
     );
   }
 
-  Widget? _buildpiece(int numpieces, List<Piece> player) {
+  Widget? _buildpiece(
+      int numpieces, List<Piece> player, Map<int, int> path, int index) {
     if (numpieces == 2) {
-      return Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          // ignore: prefer_const_literals_to_create_immutables
-          children: [
+      return Stack(
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: Text(
+              "${path[index]! + 1}",
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ),
+          // ignore: prefer_const_constructors
+          Padding(
+            padding: const EdgeInsets.all(5),
             // ignore: prefer_const_constructors
-            Align(
+            child: Align(
               alignment: Alignment.topLeft,
               child: const Icon(
                 Icons.brightness_1,
                 color: Colors.black,
               ),
             ),
+          ),
+          // ignore: prefer_const_constructors
+          Padding(
+            padding: const EdgeInsets.all(5),
             // ignore: prefer_const_constructors
-            Align(
-              alignment: Alignment.topRight,
+            child: Align(
+              alignment: Alignment.bottomRight,
               child: const Icon(
                 Icons.brightness_1,
                 color: Colors.white,
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       );
     } else if (numpieces == 1) {
-      return Icon(
-        Icons.brightness_1,
-        color: player[0].playertype == Player.player1
-            ? Colors.black
-            : Colors.white,
-        size: 30,
-      );
+      return Stack(children: [
+        Align(
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.brightness_1,
+            color: player[0].playertype == Player.player1
+                ? Colors.black
+                : Colors.white,
+            size: 30,
+          ),
+        ),
+        Align(
+          alignment: Alignment.topRight,
+          child: Text(
+            "${path[index]! + 1}",
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      ]);
     } else {
-      return null;
+      return Align(
+        alignment: Alignment.topRight,
+        child: Text(
+          "${path[index]! + 1}",
+          style: const TextStyle(color: Colors.white, fontSize: 18),
+        ),
+      );
     }
   }
 

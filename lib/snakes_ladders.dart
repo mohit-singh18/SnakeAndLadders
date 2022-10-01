@@ -2,12 +2,12 @@ import 'dart:math';
 
 // ignore: camel_case_types
 class Snake_Ladder {
-  late List<int> snakes;
-  late List<int> ladders;
+  var rnd = Random();
+  List<int> snakes = [];
+  List<int> ladders = [];
   Snake_Ladder() {
-    var rnd = Random();
-    int num;
-    snakes = [];
+    print('hi');
+    int num = 0;
     for (int i = 0; i < 6; i++) {
       num = rnd.nextInt(36);
       while (true) {
@@ -23,7 +23,8 @@ class Snake_Ladder {
       }
       snakes.add(num);
     }
-    ladders = [];
+    snakes.sort();
+    snakes = List.from(snakes.reversed);
     for (int i = 0; i < 6; i++) {
       num = rnd.nextInt(36);
       while (true) {
@@ -39,5 +40,7 @@ class Snake_Ladder {
       }
       ladders.add(num);
     }
+    ladders.sort();
+    ladders = List.from(ladders.reversed);
   }
 }

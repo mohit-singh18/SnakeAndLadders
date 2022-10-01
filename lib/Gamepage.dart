@@ -11,9 +11,12 @@ class Game extends StatelessWidget {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.deepPurple,
-          title: const Text("Ludo Game"),
+          title: const Center(
+              child: Text(
+            "Snake And Ladder Game",
+          )),
         ),
-        body: Gameboard(),
+        body: const Gameboard(),
       ),
     );
   }
