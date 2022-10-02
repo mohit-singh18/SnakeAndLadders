@@ -10,8 +10,8 @@ Snake_Ladder snakes = Snake_Ladder();
 class Board {
   // Path path = Path();
   List<Cell> getinitialboard() {
-    print(snakes.ladders);
-    print(snakes.snakes);
+    // print(snakes.ladders);
+    // print(snakes.snakes);
     final boardcells = List.generate(36, (index) {
       if (snakes.snakes.contains(index)) {
         return Cell(Index(index, Colors.red), [], 0);
@@ -28,6 +28,14 @@ class Board {
     });
     return boardcells;
   }
+
+  List<int> snake() {
+    return snakes.snakes;
+  }
+
+  List<int> ladder() {
+    return snakes.ladders;
+  }
 }
 
 extension Brd on List<Cell> {
@@ -35,17 +43,29 @@ extension Brd on List<Cell> {
   static Path path = Path();
   List<Cell> move(int diceno, Piece player) {
     int ni = path.pth[player.index]! + diceno;
+    if (ni > 35) {
+      return this;
+    }
     // print("$diceno $ni");
     //always
     this[player.index].piece.remove(player);
     this[player.index] = Cell(this[player.index].index,
         this[player.index].piece, this[player.index].piece.length);
     player.index = path.path[ni];
-    //
+    this[player.index].piece.add(player);
+    this[player.index] = Cell(this[player.index].index,
+        this[player.index].piece, this[player.index].piece.length);
+    return this;
+  }
+
+  List<Cell> moveamend(Piece player) {
+    //always
+    this[player.index].piece.remove(player);
+    this[player.index] = Cell(this[player.index].index,
+        this[player.index].piece, this[player.index].piece.length);
     //Dynamic
     if (snakes.snakes.contains(player.index)) {
-      if (player.index == snakes.snakes[0] ||
-          player.index == snakes.snakes[snakes.snakes.length - 1]) {
+      if (player.index == snakes.snakes[0]) {
         // player.index = path.pth[player.index]!;
         this[player.index].piece.add(player);
         this[player.index] = Cell(this[player.index].index,
@@ -60,8 +80,7 @@ extension Brd on List<Cell> {
             this[player.index].piece, this[player.index].piece.length);
       }
     } else if (snakes.ladders.contains(player.index)) {
-      if (player.index == snakes.ladders[0] ||
-          player.index == snakes.ladders[snakes.ladders.length - 1]) {
+      if (player.index == snakes.ladders[snakes.ladders.length - 1]) {
         // player.index = path.pth[player.index]!;
         this[player.index].piece.add(player);
         this[player.index] = Cell(this[player.index].index,
@@ -75,10 +94,6 @@ extension Brd on List<Cell> {
         this[player.index] = Cell(this[player.index].index,
             this[player.index].piece, this[player.index].piece.length);
       }
-    } else {
-      this[player.index].piece.add(player);
-      this[player.index] = Cell(this[player.index].index,
-          this[player.index].piece, this[player.index].piece.length);
     }
 
     return this;

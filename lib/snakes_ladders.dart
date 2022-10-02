@@ -1,13 +1,16 @@
 import 'dart:math';
+import 'package:snakeandladder/path.dart';
 
 // ignore: camel_case_types
 class Snake_Ladder {
+  Path path = Path();
   var rnd = Random();
   List<int> snakes = [];
   List<int> ladders = [];
   Snake_Ladder() {
-    print('hi');
     int num = 0;
+    List<int> snake = [];
+    List<int> ladder = [];
     for (int i = 0; i < 6; i++) {
       num = rnd.nextInt(36);
       while (true) {
@@ -15,16 +18,14 @@ class Snake_Ladder {
           num = rnd.nextInt(36);
           continue;
         }
-        if (snakes.contains(num)) {
+        if (snake.contains(num)) {
           num = rnd.nextInt(36);
           continue;
         }
         break;
       }
-      snakes.add(num);
+      snake.add(num);
     }
-    snakes.sort();
-    snakes = List.from(snakes.reversed);
     for (int i = 0; i < 6; i++) {
       num = rnd.nextInt(36);
       while (true) {
@@ -32,15 +33,21 @@ class Snake_Ladder {
           num = rnd.nextInt(36);
           continue;
         }
-        if (snakes.contains(num) || ladders.contains(num)) {
+        if (snake.contains(num) || ladder.contains(num)) {
           num = rnd.nextInt(36);
           continue;
         }
         break;
       }
-      ladders.add(num);
+      ladder.add(num);
     }
-    ladders.sort();
-    ladders = List.from(ladders.reversed);
+    for (var i in path.path) {
+      if (ladder.contains(i)) {
+        ladders.add(i);
+      }
+      if (snake.contains(i)) {
+        snakes.add(i);
+      }
+    }
   }
 }

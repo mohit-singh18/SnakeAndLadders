@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'package:flutter/material.dart';
 import 'board.dart';
 import 'cell.dart';
@@ -21,6 +20,7 @@ class _GameboardState extends State<Gameboard> {
   late Piece piece2 = Piece(Player.player2, 30);
   int diceno = Dice().rolldice();
   Path path = Path();
+  String display = "";
 
   @override
   void initState() {
@@ -36,7 +36,14 @@ class _GameboardState extends State<Gameboard> {
         // ignore: prefer_const_literals_to_create_immutables
         children: [
           const SizedBox(
-            height: 130,
+            height: 50,
+          ),
+          Text(
+            display,
+            style: const TextStyle(color: Colors.black, fontSize: 28),
+          ),
+          const SizedBox(
+            height: 40,
           ),
           _buildboard(),
           const SizedBox(
@@ -176,16 +183,48 @@ class _GameboardState extends State<Gameboard> {
 
   Widget _builddice() {
     return GestureDetector(
+      // ignore: avoid_returning_null_for_void
+      onDoubleTap: () => null,
       onTap: () async {
         diceno = Dice().rolldice();
-        setState(() {
-          board = board.move(
-              diceno, Player.player1 == currentTurn ? piece1 : piece2);
-        });
+        Piece currentpiece = Player.player1 == currentTurn ? piece1 : piece2;
+        // print(path.pth[currentpiece.index]! + diceno);
+        if (path.pth[currentpiece.index]! + diceno > 35) {
+          setState(() {
+            display = "Invalid Move!!";
+          });
+        } else {
+          setState(() {
+            board = board.move(diceno, currentpiece);
+            if (board[currentpiece.index].color == Colors.red) {
+              if (currentpiece.index == brd.snake()[0]) {
+                display = "On a Snake!!";
+              } else {
+                display = "On a Snake!! Move Back";
+              }
+            } else if (board[currentpiece.index].color == Colors.greenAccent) {
+              if (currentpiece.index == brd.ladder()[brd.ladder().length - 1]) {
+                display = "On a Ladder!!";
+              } else {
+                display = "On a Ladder!! Move Ahead";
+              }
+            }
+          });
+          if (board[currentpiece.index].color == Colors.red ||
+              board[currentpiece.index].color == Colors.greenAccent) {
+            await Future.delayed(const Duration(seconds: 2));
+            setState(() {
+              board = board
+                  .moveamend(Player.player1 == currentTurn ? piece1 : piece2);
+            });
+          }
+        }
+
         await Future.delayed(const Duration(seconds: 2));
         setState(() {
           currentTurn =
               currentTurn == Player.player1 ? Player.player2 : Player.player1;
+          display = "";
         });
       },
       child: Container(
