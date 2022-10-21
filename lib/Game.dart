@@ -124,7 +124,7 @@ class _GameboardState extends State<Gameboard> {
             alignment: Alignment.topRight,
             child: Text(
               "${path[index]! + 1}",
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+              style: const TextStyle(color: Colors.white, fontSize: 15),
             ),
           ),
           // ignore: prefer_const_constructors
@@ -159,7 +159,7 @@ class _GameboardState extends State<Gameboard> {
           alignment: Alignment.topRight,
           child: Text(
             "${path[index]! + 1}",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: const TextStyle(color: Colors.white, fontSize: 15),
           ),
         ),
         Align(
@@ -169,7 +169,7 @@ class _GameboardState extends State<Gameboard> {
             color: player[0].playertype == Player.player1
                 ? Colors.black
                 : Colors.white,
-            size: 30,
+            size: 26,
           ),
         ),
       ]);
@@ -179,7 +179,7 @@ class _GameboardState extends State<Gameboard> {
           alignment: Alignment.topRight,
           child: Text(
             "${path[index]! + 1}",
-            style: const TextStyle(color: Colors.white, fontSize: 18),
+            style: const TextStyle(color: Colors.white, fontSize: 15),
           ),
         ),
         index == 0
@@ -188,7 +188,7 @@ class _GameboardState extends State<Gameboard> {
                 child: Icon(
                   Icons.flag,
                   color: Color.fromARGB(255, 231, 244, 54),
-                  size: 30,
+                  size: 28,
                 ))
             : Container(),
         ((path[index]! + 1) % 6 == 0 && index != 0)
@@ -209,6 +209,7 @@ class _GameboardState extends State<Gameboard> {
       onTap: () async {
         diceno = Dice().rolldice();
         Piece currentpiece = Player.player1 == currentTurn ? piece1 : piece2;
+
         if (currentpiece.open) {
           if (path.pth[currentpiece.index]! + diceno > 35) {
             setState(() {
