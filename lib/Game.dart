@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tap_debouncer/tap_debouncer.dart';
 import 'board.dart';
 import 'cell.dart';
 import 'dice.dart';
@@ -21,6 +22,8 @@ class _GameboardState extends State<Gameboard> {
   int diceno = 1;
   Path path = Path();
   String display = "Click on the Dice to Start.";
+  int sum = 0;
+  bool t = true;
 
   @override
   void initState() {
@@ -151,7 +154,7 @@ class _GameboardState extends State<Gameboard> {
         ],
       );
     } else if (numpieces == 1) {
-      return Stack(children: <Widget>[
+      return Stack(children: [
         Align(
           alignment: Alignment.topRight,
           child: Text(
@@ -202,9 +205,7 @@ class _GameboardState extends State<Gameboard> {
   }
 
   Widget _builddice() {
-    return GestureDetector(
-      // ignore: avoid_returning_null_for_void
-
+    return TapDebouncer(
       onTap: () async {
         diceno = Dice().rolldice();
         Piece currentpiece = Player.player1 == currentTurn ? piece1 : piece2;
@@ -221,12 +222,15 @@ class _GameboardState extends State<Gameboard> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text("GAME OVER"),
-                    content: Text(
-                      currentTurn == Player.player1
-                          ? "Black Wins"
-                          : "White Wins",
-                      textScaleFactor: 2,
+                    title: const Text("GAME OVER."),
+                    content: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      child: Text(
+                        currentTurn == Player.player1
+                            ? "Black Won!!"
+                            : "White Won!!",
+                        textScaleFactor: 1.5,
+                      ),
                     ),
                     actions: [
                       TextButton(
@@ -285,7 +289,7 @@ class _GameboardState extends State<Gameboard> {
             currentpiece.open = true;
             await Future.delayed(const Duration(milliseconds: 500));
             setState(() {
-              display = "Player Open!!Roll Again.";
+              display = "Player Open!! Roll Again.";
             });
           } else {
             setState(() {
@@ -301,11 +305,16 @@ class _GameboardState extends State<Gameboard> {
           }
         }
       },
-      child: Image.asset(
-        "images/dice$diceno.png",
-        width: 50,
-        height: 50,
-      ),
+      builder: (context, onTap) {
+        return GestureDetector(
+          onTap: onTap,
+          child: Image.asset(
+            "images/dice$diceno.png",
+            width: 50,
+            height: 50,
+          ),
+        );
+      },
     );
   }
 }//main class
