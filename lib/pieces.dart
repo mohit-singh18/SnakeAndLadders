@@ -8,7 +8,8 @@ enum Player {
 class Piece {
   Player playertype;
   int index;
-  Piece(this.playertype, this.index);
+  bool open;
+  Piece(this.playertype, this.index, this.open);
   Color get color => playertype == Player.player1 ? Colors.black : Colors.white;
 
   @override

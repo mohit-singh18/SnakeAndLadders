@@ -12,6 +12,7 @@ class Board {
   List<Cell> getinitialboard() {
     // print(snakes.ladders);
     // print(snakes.snakes);
+
     final boardcells = List.generate(36, (index) {
       if (snakes.snakes.contains(index)) {
         return Cell(Index(index, Colors.red), [], 0);
@@ -19,8 +20,13 @@ class Board {
         return Cell(Index(index, Colors.greenAccent), [], 0);
       } else {
         if (index == 30) {
-          return Cell(Index(index, Colors.deepPurple),
-              [Piece(Player.player1, index), Piece(Player.player2, index)], 2);
+          return Cell(
+              Index(index, Colors.deepPurple),
+              [
+                Piece(Player.player1, index, false),
+                Piece(Player.player2, index, false)
+              ],
+              2);
         } else {
           return Cell(Index(index, Colors.deepPurple), [], 0);
         }
@@ -98,6 +104,4 @@ extension Brd on List<Cell> {
 
     return this;
   }
-
-  void open() {}
 }

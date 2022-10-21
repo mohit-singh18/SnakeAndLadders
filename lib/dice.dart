@@ -7,4 +7,12 @@ class Dice {
     num = rnd.nextInt(6) + 1;
     return num;
   }
+
+  bool open(int num) {
+    if (num == 6) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

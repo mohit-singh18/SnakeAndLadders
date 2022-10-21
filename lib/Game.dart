@@ -13,14 +13,14 @@ class Gameboard extends StatefulWidget {
 }
 
 class _GameboardState extends State<Gameboard> {
-  late Board brd = Board();
+  Board brd = Board();
   late List<Cell> board;
   late Player currentTurn;
-  late Piece piece1 = Piece(Player.player1, 30);
-  late Piece piece2 = Piece(Player.player2, 30);
-  int diceno = Dice().rolldice();
+  Piece piece1 = Piece(Player.player1, 30, false);
+  Piece piece2 = Piece(Player.player2, 30, false);
+  int diceno = 1;
   Path path = Path();
-  String display = "";
+  String display = "Click on the Dice to Start.";
 
   @override
   void initState() {
@@ -104,7 +104,7 @@ class _GameboardState extends State<Gameboard> {
       child: Container(
         // ignore: sort_child_properties_last
         child: _buildpiece(
-            board[index].numpieces, board[index].piece, Path().pth, index),
+            board[index].numpieces, board[index].piece, path.pth, index),
         decoration: BoxDecoration(
           color: board[index].color,
         ),
@@ -147,11 +147,18 @@ class _GameboardState extends State<Gameboard> {
                 color: Colors.white,
               ),
             ),
-          )
+          ),
         ],
       );
     } else if (numpieces == 1) {
-      return Stack(children: [
+      return Stack(children: <Widget>[
+        Align(
+          alignment: Alignment.topRight,
+          child: Text(
+            "${path[index]! + 1}",
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
         Align(
           alignment: Alignment.center,
           child: Icon(
@@ -162,6 +169,9 @@ class _GameboardState extends State<Gameboard> {
             size: 30,
           ),
         ),
+      ]);
+    } else {
+      return Stack(children: [
         Align(
           alignment: Alignment.topRight,
           child: Text(
@@ -169,70 +179,132 @@ class _GameboardState extends State<Gameboard> {
             style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
         ),
+        index == 0
+            ? const Align(
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.flag,
+                  color: Color.fromARGB(255, 231, 244, 54),
+                  size: 30,
+                ))
+            : Container(),
+        ((path[index]! + 1) % 6 == 0 && index != 0)
+            ? const Align(
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.arrow_upward,
+                  color: Color.fromARGB(237, 0, 3, 3),
+                  size: 25,
+                ))
+            : Container(),
       ]);
-    } else {
-      return Align(
-        alignment: Alignment.topRight,
-        child: Text(
-          "${path[index]! + 1}",
-          style: const TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      );
     }
   }
 
   Widget _builddice() {
     return GestureDetector(
       // ignore: avoid_returning_null_for_void
-      onDoubleTap: () => null,
+
       onTap: () async {
         diceno = Dice().rolldice();
         Piece currentpiece = Player.player1 == currentTurn ? piece1 : piece2;
-        // print(path.pth[currentpiece.index]! + diceno);
-        if (path.pth[currentpiece.index]! + diceno > 35) {
+        if (currentpiece.open) {
+          if (path.pth[currentpiece.index]! + diceno > 35) {
+            setState(() {
+              display = "Invalid Move!!";
+            });
+          } else if (path.pth[currentpiece.index]! + diceno == 35) {
+            setState(() {
+              board = board.move(diceno, currentpiece);
+            });
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("GAME OVER"),
+                    content: Text(
+                      currentTurn == Player.player1
+                          ? "Black Wins"
+                          : "White Wins",
+                      textScaleFactor: 2,
+                    ),
+                    actions: [
+                      TextButton(
+                        child: const Text("Start New Game"),
+                        onPressed: () {
+                          setState(() {
+                            board = brd.getinitialboard();
+                            currentTurn = Player.player1;
+                            display = "Click on the Dice to Start.";
+                            piece1 = Piece(Player.player1, 30, false);
+                            piece2 = Piece(Player.player2, 30, false);
+                          });
+
+                          Navigator.of(context).pop();
+                        },
+                      )
+                    ],
+                  );
+                });
+          } else {
+            setState(() {
+              board = board.move(diceno, currentpiece);
+              if (board[currentpiece.index].color == Colors.red) {
+                if (currentpiece.index == brd.snake()[0]) {
+                  display = "On a Snake!!";
+                } else {
+                  display = "On a Snake!! Move Back";
+                }
+              } else if (board[currentpiece.index].color ==
+                  Colors.greenAccent) {
+                if (currentpiece.index ==
+                    brd.ladder()[brd.ladder().length - 1]) {
+                  display = "On a Ladder!!";
+                } else {
+                  display = "On a Ladder!! Move Ahead";
+                }
+              }
+            });
+            if (board[currentpiece.index].color == Colors.red ||
+                board[currentpiece.index].color == Colors.greenAccent) {
+              await Future.delayed(const Duration(seconds: 1));
+              setState(() {
+                board = board
+                    .moveamend(Player.player1 == currentTurn ? piece1 : piece2);
+              });
+            }
+          }
+          await Future.delayed(const Duration(milliseconds: 1000));
           setState(() {
-            display = "Invalid Move!!";
+            currentTurn =
+                currentTurn == Player.player1 ? Player.player2 : Player.player1;
+            display = "";
           });
         } else {
-          setState(() {
-            board = board.move(diceno, currentpiece);
-            if (board[currentpiece.index].color == Colors.red) {
-              if (currentpiece.index == brd.snake()[0]) {
-                display = "On a Snake!!";
-              } else {
-                display = "On a Snake!! Move Back";
-              }
-            } else if (board[currentpiece.index].color == Colors.greenAccent) {
-              if (currentpiece.index == brd.ladder()[brd.ladder().length - 1]) {
-                display = "On a Ladder!!";
-              } else {
-                display = "On a Ladder!! Move Ahead";
-              }
-            }
-          });
-          if (board[currentpiece.index].color == Colors.red ||
-              board[currentpiece.index].color == Colors.greenAccent) {
-            await Future.delayed(const Duration(seconds: 2));
+          if (diceno == 6) {
+            currentpiece.open = true;
+            await Future.delayed(const Duration(milliseconds: 500));
             setState(() {
-              board = board
-                  .moveamend(Player.player1 == currentTurn ? piece1 : piece2);
+              display = "Player Open!!Roll Again.";
+            });
+          } else {
+            setState(() {
+              display = "Get A 6 To open!!";
+            });
+            await Future.delayed(const Duration(milliseconds: 1000));
+            setState(() {
+              currentTurn = currentTurn == Player.player1
+                  ? Player.player2
+                  : Player.player1;
+              display = "";
             });
           }
         }
-
-        await Future.delayed(const Duration(seconds: 2));
-        setState(() {
-          currentTurn =
-              currentTurn == Player.player1 ? Player.player2 : Player.player1;
-          display = "";
-        });
       },
-      child: Container(
-        child: Image.asset(
-          "images/dice$diceno.png",
-          width: 50,
-          height: 50,
-        ),
+      child: Image.asset(
+        "images/dice$diceno.png",
+        width: 50,
+        height: 50,
       ),
     );
   }
